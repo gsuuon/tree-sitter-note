@@ -1,0 +1,144 @@
+===========
+Single item
+===========
+
+- boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))
+
+
+===========
+Item, child
+===========
+
+- boop
+  - boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (children
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content)))))
+
+
+===========
+Item, body
+===========
+
+- boop
+words
+here
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body)))
+
+
+===========
+Item body, child, sibling
+===========
+
+- boop
+words
+here
+  - boop
+- boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body)
+    (children
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content))))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))
+
+
+===========
+Item body, child, code, sibling
+===========
+
+- boop
+words
+here
+```
+foobar()
+  - not an item
+```
+  - boop
+- boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body
+      (code_block
+        (code_block_content)))
+    (children
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content))))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))
+
+
+===========
+Item, body (looks like but isn't marker)
+===========
+
+- boop
+  s boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body)))
