@@ -1,0 +1,56 @@
+===========
+Section
+===========
+
+# boop
+
+-----------
+
+(document
+  (section_marker
+    (section_title)))
+
+===========
+Section and item
+===========
+
+# boop
+- boop
+
+-----------
+
+(document
+  (section_marker
+    (section_title))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))
+
+===========
+Sections and items
+===========
+
+# boop
+- boop
+## beep
+- boop
+
+-----------
+
+(document
+  (section_marker
+    (section_title))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content))
+  (section_marker
+    (section_title))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))
