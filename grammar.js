@@ -10,12 +10,20 @@ module.exports = grammar({
   rules: {
     document: $ => seq(
       repeat1(
-        seq(
+        choice(
           $.item,
-          optional($._newline)
+          $.section_marker
         )
       ),
       $._eof
+    ),
+
+    section_title: $ => $._line,
+
+    section_marker: $ => seq(
+      token(prec(1, repeat1('#'))),
+      ' ',
+      $.section_title
     ),
 
     marker_task_pending: _ => '- ',
@@ -37,7 +45,9 @@ module.exports = grammar({
       $.marker_task,
       $.marker_property
     ),
+
     content: $ => $._line,
+
     body: $ => prec.right(repeat1(
       prec.left(choice(
         $._lines,
