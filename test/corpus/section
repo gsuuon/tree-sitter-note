@@ -7,8 +7,8 @@ Section
 -----------
 
 (document
-  (section_marker
-    (section_title)))
+  (section
+    (section_header)))
 
 ===========
 Section and item
@@ -20,16 +20,16 @@ Section and item
 -----------
 
 (document
-  (section_marker
-    (section_title))
-  (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
-    (content)))
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content))))
 
 ===========
-Sections and items
+Section, subsection
 ===========
 
 # boop
@@ -40,17 +40,36 @@ Sections and items
 -----------
 
 (document
-  (section_marker
-    (section_title))
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content))
+    (section_children
+      (section
+        (section_header)
+        (item
+          (marker
+            (marker_task
+              (marker_task_pending)))
+          (content))))))
+
+===========
+Item then section
+===========
+
+- boop
+# boop
+
+-----------
+
+(document
   (item
     (marker
       (marker_task
         (marker_task_pending)))
     (content))
-  (section_marker
-    (section_title))
-  (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
-    (content)))
+  (section
+    (section_header)))

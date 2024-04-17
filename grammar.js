@@ -4,37 +4,64 @@ module.exports = grammar({
   externals: $ => [
     $._indent,
     $._dedent,
+    $._section_in,
+    $._section_out,
     $._eof
   ],
 
   rules: {
+    // document: $ => seq(
+    //   $._section_in,
+    //   $.section,
+    // ),
+
     document: $ => seq(
       repeat1(
         choice(
           $.item,
-          $.section_marker
+          seq(
+            $._section_in,
+            $.section,
+          )
         )
       ),
       $._eof
     ),
 
-    section_title: $ => $._line,
-
-    section_marker: $ => seq(
-      token(prec(1, repeat1('#'))),
-      ' ',
-      $.section_title
+    section_header: _ => token(
+      prec(2, seq(
+        repeat1('#'),
+        ' ',
+        /.+/,
+        /\n/
+      ))
     ),
 
-    marker_task_pending: _ => '- ',
-    marker_task_done: _ => '. ',
+    section_children: $ => seq(
+      $._section_in,
+      repeat1($.section),
+      choice(
+        $._section_out,
+        $._eof
+      )
+    ),
+
+    section: $ => prec.right(1, seq(
+      $.section_header,
+      prec(2, repeat($.item)),
+      prec(2, optional($.section_children))
+    )),
+
+    marker_task_pending: _ => token(prec(1, '- ')),
+    marker_task_done: _ => token(prec(1, '. ')),
+
     marker_task: $ => choice(
       $.marker_task_pending,
       $.marker_task_done,
     ),
 
-    marker_property_info: _ => '* ',
-    marker_property_label: _ => '[ ',
+    marker_property_info: _ => token(prec(1, '* ')),
+    marker_property_label: _ => token(prec(1, '[ ')),
 
     marker_property: $ => choice(
       $.marker_property_info,
@@ -48,7 +75,7 @@ module.exports = grammar({
 
     content: $ => $._line,
 
-    body: $ => prec.right(repeat1(
+    body: $ => prec.left(repeat1(
       prec.left(choice(
         $._lines,
         $.code_block
