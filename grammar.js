@@ -6,23 +6,17 @@ module.exports = grammar({
     $._dedent,
     $._section_in,
     $._section_out,
+    $._section_sibling,
     $._eof
   ],
 
   rules: {
-    // document: $ => seq(
-    //   $._section_in,
-    //   $.section,
-    // ),
-
     document: $ => seq(
-      repeat1(
-        choice(
-          $.item,
-          seq(
-            $._section_in,
-            $.section,
-          )
+      repeat($.item),
+      repeat(
+        seq(
+          optional($._section_in),
+          $.section,
         )
       ),
       $._eof
@@ -37,19 +31,21 @@ module.exports = grammar({
       ))
     ),
 
-    section_children: $ => seq(
+    section_children: $ => prec.right(seq(
       $._section_in,
       repeat1($.section),
+    )),
+
+    section: $ => prec.right(3, seq(
+      $.section_header,
+      repeat($.item),
+      optional($.section_children),
+
       choice(
         $._section_out,
+        $._section_sibling,
         $._eof
       )
-    ),
-
-    section: $ => prec.right(1, seq(
-      $.section_header,
-      prec(2, repeat($.item)),
-      prec(2, optional($.section_children))
     )),
 
     marker_task_pending: _ => token(prec(1, '- ')),

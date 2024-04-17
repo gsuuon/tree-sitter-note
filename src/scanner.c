@@ -7,6 +7,7 @@ enum TokenType {
     DEDENT,
     SECTION_IN,
     SECTION_OUT,
+    SECTION_SIBLING,
     END_OF_FILE
 };
 
@@ -113,8 +114,7 @@ bool tree_sitter_note_external_scanner_scan(
 
     }
 
-    if (valid_symbols[SECTION_IN] || valid_symbols[SECTION_OUT]) {
-        // TODO this is copypasta from above, can just do struct of struct {depth, last}, char (' ', '#') and step size (1 here, 2 above)
+    if (valid_symbols[SECTION_IN] || valid_symbols[SECTION_OUT] || valid_symbols[SECTION_SIBLING]) {
         unsigned int depth = 0;
 
         lexer->mark_end(lexer);
@@ -131,16 +131,12 @@ bool tree_sitter_note_external_scanner_scan(
             return false;
         }
 
-        printf(">>> looking for section in or out. depth: %d\n", depth);
-
         if (valid_symbols[SECTION_IN]) {
             if (depth == scanner->last_section_depth + 1) {
 
                 lexer->result_symbol = SECTION_IN;
                 scanner->last_section_depth = depth;
                 scanner->emitted_section_depth = depth;
-
-                printf(">>> section in\n");
 
                 return true;
             }
@@ -160,6 +156,14 @@ bool tree_sitter_note_external_scanner_scan(
                 lexer->result_symbol = SECTION_OUT;
                 scanner->emitted_section_depth = scanner->emitted_section_depth - 1;
                 printf(">>> section out");
+
+                return true;
+            }
+        }
+
+        if (valid_symbols[SECTION_SIBLING]) {
+            if (depth == scanner->last_section_depth) {
+                lexer->result_symbol = SECTION_SIBLING;
 
                 return true;
             }
