@@ -13,6 +13,26 @@ Single item
         (marker_task_pending)))
     (content)))
 
+===========
+Two items
+===========
+
+- boop
+- boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))
 
 ===========
 Item, child
