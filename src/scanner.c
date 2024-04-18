@@ -72,6 +72,8 @@ bool tree_sitter_note_external_scanner_scan(
             lexer->advance(lexer, false);
         }
 
+        lexer->mark_end(lexer);
+
         switch (lexer->lookahead) {
             case '-':
             case '.':
@@ -79,6 +81,18 @@ bool tree_sitter_note_external_scanner_scan(
             case '=':
             case '*':
             case '[': {
+                // next char needs to be space
+                lexer->advance(lexer, true);
+                if (lexer->lookahead != ' ') {
+                    return false;
+                }
+
+                // next char can't be newline
+                lexer->advance(lexer, true);
+                if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+                    return false;
+                }
+
                 if (valid_symbols[INDENT]) {
                     if (spaces == scanner->last_indent_column + 2) {
 
@@ -106,6 +120,8 @@ bool tree_sitter_note_external_scanner_scan(
                         return true;
                     }
                 }
+
+                return false;
             }
             default:
                 // our next token isn't a marker
@@ -147,7 +163,6 @@ bool tree_sitter_note_external_scanner_scan(
                 lexer->result_symbol = SECTION_OUT;
                 scanner->emitted_section_depth = scanner->last_indent_column - 1;
                 scanner->last_section_depth = depth;
-                printf(">>> section out");
 
                 return true;
             }
@@ -155,7 +170,6 @@ bool tree_sitter_note_external_scanner_scan(
             if (scanner->emitted_section_depth > scanner->last_section_depth) {
                 lexer->result_symbol = SECTION_OUT;
                 scanner->emitted_section_depth = scanner->emitted_section_depth - 1;
-                printf(">>> section out");
 
                 return true;
             }

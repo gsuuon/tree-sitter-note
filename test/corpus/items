@@ -232,3 +232,23 @@ Items spaced
       (marker_task
         (marker_task_pending)))
     (content)))
+
+===========
+Item no content
+===========
+
+- foo
+-
+words here
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body)))
+
+

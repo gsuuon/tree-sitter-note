@@ -12,6 +12,7 @@ module.exports = grammar({
 
   rules: {
     document: $ => seq(
+      optional($.body),
       repeat($.item),
       repeat(
         prec(2, seq(
@@ -70,7 +71,7 @@ module.exports = grammar({
       $.marker_property
     ),
 
-    content: $ => $._line,
+    content: _ => token.immediate(/.+/),
 
     body: $ => seq(
       choice(
@@ -91,6 +92,7 @@ module.exports = grammar({
       seq(
         $.marker,
         $.content,
+        $._newline,
         optional($.body),
         optional($.children)
       ),
