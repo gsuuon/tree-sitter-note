@@ -35,7 +35,7 @@ Two items
     (content)))
 
 ===========
-Item, child
+item, child
 ===========
 
 - boop
@@ -56,9 +56,37 @@ Item, child
             (marker_task_pending)))
         (content)))))
 
+===========
+item, multiple children
+===========
+
+- boop
+  - boop
+  - boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (children
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content))
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content)))))
+
 
 ===========
-Item, body
+item, body
 ===========
 
 - boop
@@ -75,9 +103,8 @@ here
     (content)
     (body)))
 
-
 ===========
-Item body, child, sibling
+item body, child, sibling
 ===========
 
 - boop
@@ -132,7 +159,7 @@ x + 1
         (code_block_content)))))
 
 ===========
-Item body, code
+item body, code
 ===========
 
 - boop
@@ -156,7 +183,7 @@ foobar()
         (code_block_content)))))
 
 ===========
-Item body, child, code, sibling
+item body, child, code, sibling
 ===========
 
 - boop
@@ -194,7 +221,7 @@ foobar()
 
 
 ===========
-Item, indented body
+item, indented body
 ===========
 
 - boop
@@ -212,7 +239,7 @@ Item, indented body
 
 
 ===========
-Items spaced
+items spaced
 ===========
 
 - boop
@@ -234,7 +261,7 @@ Items spaced
     (content)))
 
 ===========
-Item no content
+item no content
 ===========
 
 - foo

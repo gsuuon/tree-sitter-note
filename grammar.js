@@ -32,10 +32,10 @@ module.exports = grammar({
       ))
     ),
 
-    section_children: $ => prec.right(seq(
+    section_children: $ => seq(
       $._section_in,
       repeat1($.section),
-    )),
+    ),
 
     section: $ => prec.right(3, seq(
       $.section_header,
@@ -73,7 +73,7 @@ module.exports = grammar({
 
     content: _ => token.immediate(/.+/),
 
-    body: $ => seq(
+    body: $ => prec.left(seq(
       choice(
         $._line,
         $.code_block
@@ -86,7 +86,7 @@ module.exports = grammar({
           )
         )
       )
-    ),
+    )),
 
     item: $ => prec.right(
       seq(
@@ -98,7 +98,7 @@ module.exports = grammar({
       ),
     ),
 
-    children: $ => prec.left(seq(
+    children: $ => prec.right(seq(
       $._indent,
       repeat1($.item),
       optional(choice($._dedent, $._eof))
