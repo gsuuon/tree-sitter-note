@@ -5,6 +5,18 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "body"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "REPEAT",
           "content": {
             "type": "SYMBOL",
@@ -241,8 +253,11 @@
       ]
     },
     "content": {
-      "type": "SYMBOL",
-      "name": "_line"
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": ".+"
+      }
     },
     "body": {
       "type": "SEQ",
@@ -295,6 +310,10 @@
           {
             "type": "SYMBOL",
             "name": "content"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_newline"
           },
           {
             "type": "CHOICE",

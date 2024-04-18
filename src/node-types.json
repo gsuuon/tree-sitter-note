@@ -59,11 +59,6 @@
     "fields": {}
   },
   {
-    "type": "content",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "document",
     "named": true,
     "fields": {},
@@ -71,6 +66,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "body",
+          "named": true
+        },
         {
           "type": "item",
           "named": true
@@ -223,6 +222,10 @@
   {
     "type": "```\n",
     "named": false
+  },
+  {
+    "type": "content",
+    "named": true
   },
   {
     "type": "marker_property_info",
