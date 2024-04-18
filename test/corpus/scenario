@@ -1,0 +1,53 @@
+===========
+Daily note
+===========
+
+# Goals
+Get things done
+
+# Tasks
+- Chores
+  - Trash
+
+# Notes
+Pretty hot out
+
+## Log
+* 12:00 PM
+  * did a thing
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (body))
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content)
+      (children
+        (item
+          (marker
+            (marker_task
+              (marker_task_pending)))
+          (content)))))
+  (section
+    (section_header)
+    (body)
+    (section_children
+      (section
+        (section_header)
+        (item
+          (marker
+            (marker_property
+              (marker_property_info)))
+          (content))
+        (item
+          (marker
+            (marker_property
+              (marker_property_info)))
+          (content))))))

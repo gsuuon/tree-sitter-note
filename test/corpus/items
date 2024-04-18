@@ -162,3 +162,26 @@ Item, indented body
         (marker_task_pending)))
     (content)
     (body)))
+
+
+===========
+Items spaced
+===========
+
+- boop
+
+- boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content))
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)))

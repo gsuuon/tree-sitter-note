@@ -29,7 +29,88 @@ Section and item
       (content))))
 
 ===========
+Section and items
+===========
+
+# boop
+- boop
+- boop
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content))
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content))))
+
+===========
+Item then section
+===========
+
+- boop
+# boop
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content))
+  (section
+    (section_header)))
+
+===========
 Section, subsection
+===========
+
+# boop
+## boop
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (section_children
+      (section
+        (section_header)))))
+
+===========
+Section, item, subsection
+===========
+
+# boop
+- boop
+## boop
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content))
+    (section_children
+      (section
+        (section_header)))))
+
+
+===========
+Section and subsection with item
 ===========
 
 # boop
@@ -57,10 +138,25 @@ Section, subsection
           (content))))))
 
 ===========
-Item then section
+Section with body
+===========
+
+# boop
+beep
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (body)))
+
+===========
+Section after item spaced
 ===========
 
 - boop
+
 # boop
 
 -----------
@@ -70,6 +166,35 @@ Item then section
     (marker
       (marker_task
         (marker_task_pending)))
-    (content))
+      (content))
   (section
     (section_header)))
+
+
+===========
+Sections with items spaced
+===========
+
+# boop
+- boop
+
+# boop
+- boop
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content)))
+  (section
+    (section_header)
+    (item
+      (marker
+        (marker_task
+          (marker_task_pending)))
+      (content))))
