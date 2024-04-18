@@ -69,10 +69,14 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "item",
+          "named": true
+        },
+        {
+          "type": "section",
           "named": true
         }
       ]
@@ -163,6 +167,48 @@
     }
   },
   {
+    "type": "section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body",
+          "named": true
+        },
+        {
+          "type": "item",
+          "named": true
+        },
+        {
+          "type": "section_children",
+          "named": true
+        },
+        {
+          "type": "section_header",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "section_children",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "section",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "```",
     "named": false
   },
@@ -180,6 +226,10 @@
   },
   {
     "type": "marker_task_pending",
+    "named": true
+  },
+  {
+    "type": "section_header",
     "named": true
   }
 ]
