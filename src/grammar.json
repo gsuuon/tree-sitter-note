@@ -404,48 +404,57 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "TOKEN",
-          "content": {
-            "type": "PREC",
-            "value": 1,
-            "content": {
-              "type": "STRING",
-              "value": "```"
-            }
-          }
-        },
-        {
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "code_block_language"
+              "type": "TOKEN",
+              "content": {
+                "type": "PREC",
+                "value": 1,
+                "content": {
+                  "type": "STRING",
+                  "value": "```\n"
+                }
+              }
             },
             {
-              "type": "BLANK"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": 1,
+                    "content": {
+                      "type": "STRING",
+                      "value": "\n```"
+                    }
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "code_block_language"
+                },
+                {
+                  "type": "STRING",
+                  "value": "\n"
+                }
+              ]
             }
           ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_newline"
         },
         {
           "type": "SYMBOL",
           "name": "code_block_content"
         },
         {
-          "type": "SYMBOL",
-          "name": "_newline"
-        },
-        {
           "type": "TOKEN",
           "content": {
             "type": "PREC",
             "value": 1,
             "content": {
               "type": "STRING",
-              "value": "```"
+              "value": "\n```\n"
             }
           }
         }
