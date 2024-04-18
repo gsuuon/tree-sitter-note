@@ -114,12 +114,16 @@ module.exports = grammar({
     code_block_language: $ => $._line,
     code_block_content: $ => prec.left($._lines),
     code_block: $ => seq(
-      token(prec(1, '```')),
-      optional($.code_block_language),
-      $._newline,
+      choice(
+        token(prec(1, '```\n')),
+        seq(
+          token(prec(1, '\n```')),
+          $.code_block_language,
+          '\n'
+        )
+      ),
       $.code_block_content,
-      $._newline,
-      token(prec(1, '```')),
+      token(prec(1, '\n```\n')),
     )
   }
 });
