@@ -54,7 +54,7 @@ bool tree_sitter_note_external_scanner_scan(
 ) {
     Scanner *scanner = (Scanner *)payload;
 
-    if (lexer->lookahead == '\n') {
+    while (lexer->lookahead == '\n') {
         lexer->advance(lexer, true);
     }
 

@@ -14,10 +14,10 @@ module.exports = grammar({
     document: $ => seq(
       repeat($.item),
       repeat(
-        seq(
+        prec(2, seq(
           optional($._section_in),
           $.section,
-        )
+        ))
       ),
       $._eof
     ),
@@ -38,6 +38,7 @@ module.exports = grammar({
 
     section: $ => prec.right(3, seq(
       $.section_header,
+      optional($.body),
       repeat($.item),
       optional($.section_children),
 
@@ -71,12 +72,20 @@ module.exports = grammar({
 
     content: $ => $._line,
 
-    body: $ => prec.left(repeat1(
-      prec.left(choice(
-        $._lines,
+    body: $ => seq(
+      choice(
+        $._line,
         $.code_block
-      ))
-    )),
+      ),
+      repeat(
+        prec.left(
+          choice(
+            $.code_block,
+            $._lines
+          )
+        )
+      )
+    ),
 
     item: $ => prec.right(
       seq(
@@ -87,11 +96,11 @@ module.exports = grammar({
       ),
     ),
 
-    children: $ => seq(
+    children: $ => prec.left(seq(
       $._indent,
       repeat1($.item),
-      choice($._dedent, $._eof)
-    ),
+      optional(choice($._dedent, $._eof))
+    )),
 
     _line: _ => /.+/,
     _lines: $ => repeat1(
