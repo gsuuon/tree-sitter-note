@@ -93,7 +93,7 @@ module.exports = grammar({
       seq(
         $.marker,
         $.content,
-        $._newline,
+        token.immediate(/\n/),
         optional($.body),
         optional($.children)
       ),

@@ -1,5 +1,5 @@
 ===========
-Section
+section
 ===========
 
 # boop
@@ -11,7 +11,7 @@ Section
     (section_header)))
 
 ===========
-Section and item
+section and item
 ===========
 
 # boop
@@ -29,7 +29,7 @@ Section and item
       (content))))
 
 ===========
-Section and items
+section and items
 ===========
 
 # boop
@@ -71,7 +71,7 @@ Item then section
     (section_header)))
 
 ===========
-Section, subsection
+section, subsection
 ===========
 
 # boop
@@ -87,7 +87,7 @@ Section, subsection
         (section_header)))))
 
 ===========
-Section, item, subsection
+section, item, subsection
 ===========
 
 # boop
@@ -110,7 +110,7 @@ Section, item, subsection
 
 
 ===========
-Section and subsection with item
+section and subsection with item
 ===========
 
 # boop
@@ -138,7 +138,7 @@ Section and subsection with item
           (content))))))
 
 ===========
-Section with body
+section with body
 ===========
 
 # boop
@@ -152,7 +152,7 @@ beep
     (body)))
 
 ===========
-Section after item spaced
+section after item spaced
 ===========
 
 - boop
@@ -172,7 +172,7 @@ Section after item spaced
 
 
 ===========
-Sections with items spaced
+sections with items spaced
 ===========
 
 # boop
@@ -198,3 +198,43 @@ Sections with items spaced
         (marker_task
           (marker_task_pending)))
       (content))))
+
+
+===========
+item child, section, item child
+===========
+
+- A
+  - A1
+
+# F
+- B
+  - B1
+
+-----------
+
+(document
+ (item
+  (marker
+   (marker_task
+    (marker_task_pending)))
+  (content)
+  (children
+   (item
+    (marker
+     (marker_task
+      (marker_task_pending)))
+    (content))))
+ (section
+  (section_header)
+  (item
+   (marker
+    (marker_task
+     (marker_task_pending)))
+   (content)
+   (children
+    (item
+     (marker
+      (marker_task
+       (marker_task_pending)))
+     (content))))))

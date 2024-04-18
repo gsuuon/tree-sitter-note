@@ -56,9 +56,10 @@ Pretty hot out
           (marker
             (marker_property
               (marker_property_info)))
-          (content))
-        (item
-          (marker
-            (marker_property
-              (marker_property_info)))
-          (content))))))
+          (content)
+          (children
+            (item
+              (marker
+                (marker_property
+                  (marker_property_info)))
+              (content))))))))

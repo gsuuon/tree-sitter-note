@@ -174,6 +174,8 @@ bool tree_sitter_note_external_scanner_scan(
                 lexer->result_symbol = SECTION_IN;
                 scanner->last_section_depth = depth;
                 scanner->emitted_section_depth = depth;
+                scanner->last_indent_column = 0;
+                scanner->emitted_indent_column = 0;
 
                 return true;
             }
@@ -184,6 +186,8 @@ bool tree_sitter_note_external_scanner_scan(
                 lexer->result_symbol = SECTION_OUT;
                 scanner->emitted_section_depth = scanner->last_indent_column - 1;
                 scanner->last_section_depth = depth;
+                scanner->last_indent_column = 0;
+                scanner->emitted_indent_column = 0;
 
                 return true;
             }
@@ -191,6 +195,8 @@ bool tree_sitter_note_external_scanner_scan(
             if (scanner->emitted_section_depth > scanner->last_section_depth) {
                 lexer->result_symbol = SECTION_OUT;
                 scanner->emitted_section_depth = scanner->emitted_section_depth - 1;
+                scanner->last_indent_column = 0;
+                scanner->emitted_indent_column = 0;
 
                 return true;
             }
@@ -199,6 +205,8 @@ bool tree_sitter_note_external_scanner_scan(
         if (valid_symbols[SECTION_SIBLING]) {
             if (depth == scanner->last_section_depth) {
                 lexer->result_symbol = SECTION_SIBLING;
+                scanner->last_indent_column = 0;
+                scanner->emitted_indent_column = 0;
 
                 return true;
             }
