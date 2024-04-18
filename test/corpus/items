@@ -134,6 +134,35 @@ here
         (marker_task_pending)))
     (content)))
 
+===========
+item, children with body
+===========
+
+- A
+  - A1
+aa
+  - A2
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (children
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content)
+        (body))
+      (item
+        (marker
+          (marker_task
+            (marker_task_pending)))
+        (content)))))
 
 ===========
 Code block

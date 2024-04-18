@@ -4,6 +4,7 @@ module.exports = grammar({
   externals: $ => [
     $._indent,
     $._dedent,
+    $._eqdent,
     $._section_in,
     $._section_out,
     $._section_sibling,
@@ -73,20 +74,20 @@ module.exports = grammar({
 
     content: _ => token.immediate(/.+/),
 
-    body: $ => prec.left(seq(
+    body: $ => seq(
       choice(
         $._line,
         $.code_block
       ),
       repeat(
-        prec.left(
+        prec.right(
           choice(
             $.code_block,
             $._lines
           )
         )
       )
-    )),
+    ),
 
     item: $ => prec.right(
       seq(
@@ -100,7 +101,12 @@ module.exports = grammar({
 
     children: $ => prec.right(seq(
       $._indent,
-      repeat1($.item),
+      repeat1(
+        seq(
+          optional($._eqdent),
+          $.item,
+        )
+      ),
       optional(choice($._dedent, $._eof))
     )),
 

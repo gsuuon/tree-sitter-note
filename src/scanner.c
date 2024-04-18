@@ -3,6 +3,7 @@
 enum TokenType {
     INDENT,
     DEDENT,
+    EQDENT,
     SECTION_IN,
     SECTION_OUT,
     SECTION_SIBLING,
@@ -73,7 +74,7 @@ bool tree_sitter_note_external_scanner_scan(
         return true;
     }
 
-    if (valid_symbols[INDENT] || valid_symbols[DEDENT]) {
+    if (valid_symbols[INDENT] || valid_symbols[DEDENT] || valid_symbols[EQDENT]) {
         unsigned int spaces = 0;
 
         while (lexer->lookahead == ' ') {
@@ -125,6 +126,17 @@ bool tree_sitter_note_external_scanner_scan(
                     if (scanner->emitted_indent_column > scanner->last_indent_column) {
                         lexer->result_symbol = DEDENT;
                         scanner->emitted_indent_column = scanner->emitted_indent_column - 2;
+
+                        return true;
+                    }
+                }
+
+                if (valid_symbols[EQDENT]) {
+                    if (spaces == scanner->last_indent_column) {
+
+                        lexer->result_symbol = EQDENT;
+                        scanner->last_indent_column = spaces;
+                        scanner->emitted_indent_column = spaces;
 
                         return true;
                     }
