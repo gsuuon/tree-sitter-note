@@ -1,6 +1,4 @@
 #include "tree_sitter/parser.h"
-#include "tree_sitter/alloc.h"
-#include "tree_sitter/array.h"
 
 enum TokenType {
     INDENT,
@@ -20,11 +18,11 @@ typedef struct {
 
 
 void *tree_sitter_note_external_scanner_create(void) {
-    return ts_calloc(1, sizeof(Scanner));
+    return calloc(1, sizeof(Scanner));
 }
 
 void tree_sitter_note_external_scanner_destroy(void *payload) {
-    ts_free(payload);
+    free(payload);
 }
 
 unsigned tree_sitter_note_external_scanner_serialize(
@@ -43,7 +41,18 @@ void tree_sitter_note_external_scanner_deserialize(
 ) {
     if (length == sizeof(Scanner)) {
         Scanner *scanner = (Scanner *)payload;
+        scanner->last_indent_column = 0;
+        scanner->emitted_indent_column = 0;
+        scanner->last_section_depth = 0;
+        scanner->emitted_section_depth = 0;
         memcpy(payload, buffer, sizeof(Scanner));
+    } else {
+        // reset
+        Scanner *scanner = (Scanner *)payload;
+        scanner->last_indent_column = 0;
+        scanner->emitted_indent_column = 0;
+        scanner->last_section_depth = 0;
+        scanner->emitted_section_depth = 0;
     }
 }
 

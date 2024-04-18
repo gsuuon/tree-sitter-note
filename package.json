@@ -2,7 +2,7 @@
   "name": "tree-sitter-note",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "bindings/node",
   "types": "bindings/node",
   "scripts": {
     "test": "tree-sitter test",
@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "tree-sitter-cli": "^0.22.5",
+    "tree-sitter-cli": "^0.20.8",
     "prebuildify": "^6.0.0"
   },
   "tree-sitter": [
