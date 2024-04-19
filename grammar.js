@@ -53,10 +53,16 @@ module.exports = grammar({
 
     marker_task_pending: _ => token(prec(1, '- ')),
     marker_task_done: _ => token(prec(1, '. ')),
+    marker_task_paused: _ => token(prec(1, '= ')),
+    marker_task_cancelled: _ => token(prec(1, ', ')),
+    marker_task_current: _ => token(prec(1, '> ')),
 
     marker_task: $ => choice(
       $.marker_task_pending,
       $.marker_task_done,
+      $.marker_task_paused,
+      $.marker_task_cancelled,
+      $.marker_task_current
     ),
 
     marker_property_info: _ => token(prec(1, '* ')),
@@ -125,7 +131,7 @@ module.exports = grammar({
       choice(
         token(prec(1, '```\n')),
         seq(
-          token(prec(1, '\n```')),
+          token(prec(1, '```')),
           $.code_block_language,
           '\n'
         )

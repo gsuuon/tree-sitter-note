@@ -165,7 +165,7 @@ aa
         (content)))))
 
 ===========
-Code block
+code block
 ===========
 
 - boop
@@ -185,6 +185,28 @@ x + 1
     (content)
     (body
       (code_block
+        (code_block_content)))))
+
+===========
+code block language
+===========
+
+- boop
+```js
+const x = 0
+```
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body
+      (code_block
+        (code_block_language)
         (code_block_content)))))
 
 ===========
