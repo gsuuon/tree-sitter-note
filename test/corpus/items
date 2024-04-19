@@ -210,6 +210,25 @@ const x = 0
         (code_block_content)))))
 
 ===========
+empty code block
+===========
+
+- boop
+```
+```
+
+-----------
+
+(document
+  (item
+    (marker
+      (marker_task
+        (marker_task_pending)))
+    (content)
+    (body
+      (code_block))))
+
+===========
 item body, code
 ===========
 

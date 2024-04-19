@@ -136,8 +136,8 @@ module.exports = grammar({
           '\n'
         )
       ),
-      $.code_block_content,
-      token(prec(1, '\n```\n')),
+      optional($.code_block_content),
+      token(prec(1, '```\n')),
     )
   }
 });
