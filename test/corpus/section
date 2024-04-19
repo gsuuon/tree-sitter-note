@@ -87,6 +87,25 @@ section, subsection
         (section_header)))))
 
 ===========
+section, subsections
+===========
+
+# boop
+## boop
+## boop
+
+-----------
+
+(document
+  (section
+    (section_header)
+    (section_children
+      (section
+        (section_header))
+      (section
+        (section_header)))))
+
+===========
 section, item, subsection
 ===========
 

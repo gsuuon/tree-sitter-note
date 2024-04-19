@@ -24,18 +24,27 @@ module.exports = grammar({
       $._eof
     ),
 
-    section_header: _ => token(
-      prec(2, seq(
-        repeat1('#'),
-        ' ',
-        /.+/,
-        /\n/
-      ))
+    section_header: $ => seq(
+      optional(
+        $._section_sibling,
+      ),
+      token(
+        prec(2, seq(
+          repeat1('#'),
+          ' ',
+          /.+/,
+          /\n/
+        ))
+      )
     ),
 
     section_children: $ => seq(
       $._section_in,
-      repeat1($.section),
+      prec.right(2, repeat1($.section)),
+      choice(
+        $._section_out,
+        $._eof
+      )
     ),
 
     section: $ => prec.right(3, seq(
@@ -43,12 +52,6 @@ module.exports = grammar({
       optional($.body),
       repeat($.item),
       optional($.section_children),
-
-      choice(
-        $._section_out,
-        $._section_sibling,
-        $._eof
-      )
     )),
 
     marker_task_pending: _ => token(prec(1, '- ')),

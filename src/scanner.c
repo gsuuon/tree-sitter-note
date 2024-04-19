@@ -69,7 +69,6 @@ bool tree_sitter_note_external_scanner_scan(
     }
 
     if (valid_symbols[END_OF_FILE] && lexer->eof(lexer)) {
-
         lexer->result_symbol = END_OF_FILE;
         return true;
     }
@@ -184,7 +183,7 @@ bool tree_sitter_note_external_scanner_scan(
         if (valid_symbols[SECTION_OUT]) {
             if (depth < scanner->last_section_depth) {
                 lexer->result_symbol = SECTION_OUT;
-                scanner->emitted_section_depth = scanner->last_indent_column - 1;
+                scanner->emitted_section_depth = scanner->last_section_depth - 1;
                 scanner->last_section_depth = depth;
                 scanner->last_indent_column = 0;
                 scanner->emitted_indent_column = 0;
