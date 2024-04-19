@@ -35,7 +35,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "code_block_content",
@@ -155,7 +155,19 @@
       "required": true,
       "types": [
         {
+          "type": "marker_task_cancelled",
+          "named": true
+        },
+        {
+          "type": "marker_task_current",
+          "named": true
+        },
+        {
           "type": "marker_task_done",
+          "named": true
+        },
+        {
+          "type": "marker_task_paused",
           "named": true
         },
         {
@@ -212,11 +224,7 @@
     "named": false
   },
   {
-    "type": "\n```",
-    "named": false
-  },
-  {
-    "type": "\n```\n",
+    "type": "```",
     "named": false
   },
   {
@@ -236,7 +244,19 @@
     "named": true
   },
   {
+    "type": "marker_task_cancelled",
+    "named": true
+  },
+  {
+    "type": "marker_task_current",
+    "named": true
+  },
+  {
     "type": "marker_task_done",
+    "named": true
+  },
+  {
+    "type": "marker_task_paused",
     "named": true
   },
   {
