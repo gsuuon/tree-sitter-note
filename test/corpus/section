@@ -1,83 +1,75 @@
-===========
+================================================================================
 section
-===========
+================================================================================
 
 # boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)))
 
-===========
+================================================================================
 section and item
-===========
+================================================================================
 
 # boop
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content))))
 
-===========
+================================================================================
 section and items
-===========
+================================================================================
 
 # boop
 - boop
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content))
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content))))
 
-===========
+================================================================================
 Item then section
-===========
+================================================================================
 
 - boop
 # boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content))
   (section
     (section_header)))
 
-===========
+================================================================================
 section, subsection
-===========
+================================================================================
 
 # boop
 ## boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
@@ -86,15 +78,15 @@ section, subsection
       (section
         (section_header)))))
 
-===========
+================================================================================
 section, subsections
-===========
+================================================================================
 
 # boop
 ## boop
 ## boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
@@ -105,94 +97,84 @@ section, subsections
       (section
         (section_header)))))
 
-===========
+================================================================================
 section, item, subsection
-===========
+================================================================================
 
 # boop
 - boop
 ## boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content))
     (section_children
       (section
         (section_header)))))
 
-
-===========
+================================================================================
 section and subsection with item
-===========
+================================================================================
 
 # boop
 - boop
 ## beep
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content))
     (section_children
       (section
         (section_header)
         (item
-          (marker
-            (marker_task
-              (marker_task_pending)))
+          (marker_task_pending)
           (content))))))
 
-===========
+================================================================================
 section with body
-===========
+================================================================================
 
 # boop
 beep
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)
     (body)))
 
-===========
+================================================================================
 section after item spaced
-===========
+================================================================================
 
 - boop
 
 # boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
-      (content))
+    (marker_task_pending)
+    (content))
   (section
     (section_header)))
 
-
-===========
+================================================================================
 sections with items spaced
-===========
+================================================================================
 
 # boop
 - boop
@@ -200,28 +182,23 @@ sections with items spaced
 # boop
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content)))
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content))))
 
-
-===========
+================================================================================
 item child, section, item child
-===========
+================================================================================
 
 - A
   - A1
@@ -230,30 +207,20 @@ item child, section, item child
 - B
   - B1
 
------------
+--------------------------------------------------------------------------------
 
 (document
- (item
-  (marker
-   (marker_task
-    (marker_task_pending)))
-  (content)
-  (children
-   (item
-    (marker
-     (marker_task
-      (marker_task_pending)))
-    (content))))
- (section
-  (section_header)
   (item
-   (marker
-    (marker_task
-     (marker_task_pending)))
-   (content)
-   (children
+    (marker_task_pending)
+    (content)
     (item
-     (marker
-      (marker_task
-       (marker_task_pending)))
-     (content))))))
+      (marker_task_pending)
+      (content)))
+  (section
+    (section_header)
+    (item
+      (marker_task_pending)
+      (content)
+      (item
+        (marker_task_pending)
+        (content)))))

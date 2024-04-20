@@ -60,7 +60,7 @@ module.exports = grammar({
     marker_task_cancelled: _ => token(prec(1, ', ')),
     marker_task_current: _ => token(prec(1, '> ')),
 
-    marker_task: $ => choice(
+    _marker_task: $ => choice(
       $.marker_task_pending,
       $.marker_task_done,
       $.marker_task_paused,
@@ -71,14 +71,14 @@ module.exports = grammar({
     marker_property_info: _ => token(prec(1, '* ')),
     marker_property_label: _ => token(prec(1, '[ ')),
 
-    marker_property: $ => choice(
+    _marker_property: $ => choice(
       $.marker_property_info,
       $.marker_property_label
     ),
 
-    marker: $ => choice(
-      $.marker_task,
-      $.marker_property
+    _marker: $ => choice(
+      $._marker_task,
+      $._marker_property
     ),
 
     content: _ => token.immediate(/.+/),
@@ -100,15 +100,15 @@ module.exports = grammar({
 
     item: $ => prec.right(
       seq(
-        $.marker,
+        field('marker', $._marker),
         $.content,
         token.immediate(/\n/),
         optional($.body),
-        optional($.children)
+        optional($._children)
       ),
     ),
 
-    children: $ => prec.right(seq(
+    _children: $ => prec.right(seq(
       $._indent,
       repeat1(
         seq(

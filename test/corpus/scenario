@@ -1,17 +1,17 @@
-===========
+================================================================================
 Just a body
-===========
+================================================================================
 
 Get things done
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (body))
 
-===========
+================================================================================
 Daily note
-===========
+================================================================================
 
 # Goals
 Get things done
@@ -27,7 +27,7 @@ Pretty hot out
 * 12:00 PM
   * did a thing
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (section
@@ -36,16 +36,11 @@ Pretty hot out
   (section
     (section_header)
     (item
-      (marker
-        (marker_task
-          (marker_task_pending)))
+      (marker_task_pending)
       (content)
-      (children
-        (item
-          (marker
-            (marker_task
-              (marker_task_pending)))
-          (content)))))
+      (item
+        (marker_task_pending)
+        (content))))
   (section
     (section_header)
     (body)
@@ -53,13 +48,8 @@ Pretty hot out
       (section
         (section_header)
         (item
-          (marker
-            (marker_property
-              (marker_property_info)))
+          (marker_property_info)
           (content)
-          (children
-            (item
-              (marker
-                (marker_property
-                  (marker_property_info)))
-              (content))))))))
+          (item
+            (marker_property_info)
+            (content)))))))

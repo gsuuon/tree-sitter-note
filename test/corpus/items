@@ -1,111 +1,90 @@
-===========
+================================================================================
 Single item
-===========
+================================================================================
 
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)))
 
-===========
+================================================================================
 Two items
-===========
+================================================================================
 
 - boop
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content))
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)))
 
-===========
+================================================================================
 item, child
-===========
+================================================================================
 
 - boop
   - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
-    (children
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content)))))
+    (item
+      (marker_task_pending)
+      (content))))
 
-===========
+================================================================================
 item, multiple children
-===========
+================================================================================
 
 - boop
   - boop
   - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
-    (children
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content))
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content)))))
+    (item
+      (marker_task_pending)
+      (content))
+    (item
+      (marker_task_pending)
+      (content))))
 
-
-===========
+================================================================================
 item, body
-===========
+================================================================================
 
 - boop
 words
 here
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body)))
 
-===========
+================================================================================
 item body, child, sibling
-===========
+================================================================================
 
 - boop
 words
@@ -113,60 +92,46 @@ here
   - boop
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body)
-    (children
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content))))
+    (item
+      (marker_task_pending)
+      (content)))
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)))
 
-===========
+================================================================================
 item, children with body
-===========
+================================================================================
 
 - A
   - A1
 aa
   - A2
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
-    (children
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content)
-        (body))
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content)))))
+    (item
+      (marker_task_pending)
+      (content)
+      (body))
+    (item
+      (marker_task_pending)
+      (content))))
 
-===========
+================================================================================
 code block
-===========
+================================================================================
 
 - boop
 ```
@@ -175,62 +140,56 @@ x + 1
   - 2
 ```
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body
       (code_block
         (code_block_content)))))
 
-===========
+================================================================================
 code block language
-===========
+================================================================================
 
 - boop
 ```js
 const x = 0
 ```
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body
       (code_block
         (code_block_language)
         (code_block_content)))))
 
-===========
+================================================================================
 empty code block
-===========
+================================================================================
 
 - boop
 ```
 ```
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body
       (code_block))))
 
-===========
+================================================================================
 item body, code
-===========
+================================================================================
 
 - boop
 words
@@ -240,21 +199,19 @@ foobar()
   - not an item
 ```
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body
       (code_block
         (code_block_content)))))
 
-===========
+================================================================================
 item body, child, code, sibling
-===========
+================================================================================
 
 - boop
 words
@@ -266,86 +223,67 @@ foobar()
   - boop
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body
       (code_block
         (code_block_content)))
-    (children
-      (item
-        (marker
-          (marker_task
-            (marker_task_pending)))
-        (content))))
+    (item
+      (marker_task_pending)
+      (content)))
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)))
 
-
-===========
+================================================================================
 item, indented body
-===========
+================================================================================
 
 - boop
   s boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body)))
 
-
-===========
+================================================================================
 items spaced
-===========
+================================================================================
 
 - boop
 
 - boop
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content))
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)))
 
-===========
+================================================================================
 item no content
-===========
+================================================================================
 
 - foo
 -
 words here
 
------------
+--------------------------------------------------------------------------------
 
 (document
   (item
-    (marker
-      (marker_task
-        (marker_task_pending)))
+    (marker_task_pending)
     (content)
     (body)))
-
-
