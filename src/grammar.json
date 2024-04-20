@@ -237,7 +237,7 @@
         }
       }
     },
-    "marker_task": {
+    "_marker_task": {
       "type": "CHOICE",
       "members": [
         {
@@ -284,7 +284,7 @@
         }
       }
     },
-    "marker_property": {
+    "_marker_property": {
       "type": "CHOICE",
       "members": [
         {
@@ -297,16 +297,16 @@
         }
       ]
     },
-    "marker": {
+    "_marker": {
       "type": "CHOICE",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "marker_task"
+          "name": "_marker_task"
         },
         {
           "type": "SYMBOL",
-          "name": "marker_property"
+          "name": "_marker_property"
         }
       ]
     },
@@ -362,8 +362,12 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "marker"
+            "type": "FIELD",
+            "name": "marker",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_marker"
+            }
           },
           {
             "type": "SYMBOL",
@@ -393,7 +397,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "children"
+                "name": "_children"
               },
               {
                 "type": "BLANK"
@@ -403,7 +407,7 @@
         ]
       }
     },
-    "children": {
+    "_children": {
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
