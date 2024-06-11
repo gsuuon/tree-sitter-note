@@ -76,12 +76,12 @@ bool tree_sitter_note_external_scanner_scan(
     if (valid_symbols[INDENT] || valid_symbols[DEDENT] || valid_symbols[EQDENT]) {
         unsigned int spaces = 0;
 
-        lexer->mark_end(lexer);
-
         while (lexer->lookahead == ' ') {
             spaces++;
-            lexer->advance(lexer, true);
+            lexer->advance(lexer, false);
         }
+
+        lexer->mark_end(lexer);
 
         switch (lexer->lookahead) {
             case '-':

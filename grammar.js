@@ -11,10 +11,12 @@ module.exports = grammar({
     $._eof
   ],
 
+  extras: _ => [' '], // explicit newlines
+
   rules: {
     document: $ => seq(
-      optional($.body),
-      repeat($.item),
+      optional($._body),
+      repeat($._item),
       repeat(
         prec(2, seq(
           optional($._section_in),
@@ -22,6 +24,16 @@ module.exports = grammar({
         ))
       ),
       $._eof
+    ),
+
+    _body: $ => seq(
+      optional($._blanklines),
+      $.body
+    ),
+
+    _item: $ => seq(
+      optional($._blanklines),
+      $.item
     ),
 
     section_header: $ => seq(
@@ -54,11 +66,11 @@ module.exports = grammar({
       optional($.section_children),
     )),
 
-    marker_task_pending: _ => token(prec(1, '- ')),
-    marker_task_done: _ => token(prec(1, '. ')),
-    marker_task_paused: _ => token(prec(1, '= ')),
-    marker_task_cancelled: _ => token(prec(1, ', ')),
-    marker_task_current: _ => token(prec(1, '> ')),
+    marker_task_pending: _ => token.immediate(prec(1, '- ')),
+    marker_task_done: _ => token.immediate(prec(1, '. ')),
+    marker_task_paused: _ => token.immediate(prec(1, '= ')),
+    marker_task_cancelled: _ => token.immediate(prec(1, ', ')),
+    marker_task_current: _ => token.immediate(prec(1, '> ')),
 
     _marker_task: $ => choice(
       $.marker_task_pending,
@@ -68,8 +80,8 @@ module.exports = grammar({
       $.marker_task_current
     ),
 
-    marker_property_info: _ => token(prec(1, '* ')),
-    marker_property_label: _ => token(prec(1, '[ ')),
+    marker_property_info: _ => token.immediate(prec(1, '* ')),
+    marker_property_label: _ => token.immediate(prec(1, '[ ')),
 
     _marker_property: $ => choice(
       $.marker_property_info,
@@ -83,16 +95,12 @@ module.exports = grammar({
 
     content: _ => token.immediate(/.+/),
 
-    body: $ => seq(
-      choice(
-        $._line,
-        $.code_block
-      ),
-      repeat(
-        prec.right(
-          choice(
-            $.code_block,
-            $._lines
+    body: $ => prec.right(
+      seq(
+        choice($._line, $.code_block),
+        repeat(
+          prec.right(
+            choice($.code_block, $._lines, $._blanklines)
           )
         )
       )
@@ -108,16 +116,19 @@ module.exports = grammar({
       ),
     ),
 
-    _children: $ => prec.right(seq(
-      $._indent,
-      repeat1(
-        seq(
-          optional($._eqdent),
-          $.item,
-        )
-      ),
-      optional(choice($._dedent, $._eof))
-    )),
+    _children: $ => prec.right(
+      seq(
+        $._indent,
+        $.item,
+        repeat(
+          seq(
+            $._eqdent,
+            $.item,
+          )
+        ),
+        optional(choice($._dedent, $._eof))
+      )
+    ),
 
     _line: _ => /.+/,
     _lines: $ => repeat1(
@@ -127,6 +138,7 @@ module.exports = grammar({
       )
     ),
     _newline: _ => /\n/,
+    _blanklines: _ => /\n+/,
 
     code_block_language: $ => $._line,
     code_block_content: $ => prec.left($._lines),
