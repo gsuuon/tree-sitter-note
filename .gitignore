@@ -10,6 +10,7 @@ node_modules/
 
 # Swift artifacts
 .build/
+Package.swift
 
 # Go artifacts
 go.sum
@@ -20,6 +21,8 @@ _obj/
 dist/
 *.egg-info
 *.whl
+
+pyproject.toml
 
 # C artifacts
 *.a
@@ -39,3 +42,16 @@ dist/
 
 *.exp
 *.lib
+
+
+# Updated to 22, looks like these also need to be ignored
+src/tree_sitter/
+setup.py
+*.pdb
+
+# unecessary bindings
+bindings/c/
+bindings/go/
+bindings/python/
+bindings/swift/
+
