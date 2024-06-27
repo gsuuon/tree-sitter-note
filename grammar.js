@@ -46,12 +46,16 @@ module.exports = grammar({
     ////// Items //////
     content: _ => /.+/,
 
-    body: _ => seq(
-      /.+/,
-      repeat(
-        seq(
-          /\n/,
-          /.+/
+    body_line: _ => /.+/,
+
+    body: $ => seq(
+      $.body_line,
+      prec.left(
+        repeat(
+          seq(
+            $.newline,
+            $.body_line
+          )
         )
       )
     ),
