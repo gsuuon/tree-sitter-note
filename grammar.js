@@ -9,75 +9,92 @@ module.exports = grammar({
     $.indent,
     $.dedent,
     $.eqdent,
-    $.eof
+    $.bof,
+    $.eof,
   ],
 
   conflicts: $ => [
-    [$.items_root],
-    [$.item_top]
+    [$.items_repeat],
+    [$.item_item],
+    [$.body],
   ],
 
   extras: _ => [], // explicit everything
 
   rules: {
     document: $ => seq(
-      $.items_root,
-      optional($.newline), // TODO not sure why this is necessary when eof consumes and skips newlines
+      optional(
+        seq(
+          $.start_of_line,
+          $.body
+        )
+      ),
+      $.items_repeat,
       $.eof
     ),
 
-    items_root: $ => seq(
-      // This only exists because there is no BOF or regex anchoring
-      // ___item_repeat doesn't work due to required newline seps
-      $.eqdent,
-      $.item,
+    ////// Newlines //////
+
+    // This only exists because there is no BOF or regex anchoring
+    start_of_line: $ => choice(
+      $.newline,
+      $.bof,
+    ),
+
+    newline: _ => /\n/,
+
+    ////// Items //////
+    content: _ => /.+/,
+
+    body: _ => seq(
+      /.+/,
       repeat(
         seq(
-          optional($.newline),
-          // TODO dedent will take this newline, but otherwise needed before eqdent
-          $.eqdent,
-          $.item,
+          /\n/,
+          /.+/
         )
       )
     ),
 
-    newline: _ => '\n',
-
-    content: _ => /.+/,
-
     item: $ => choice(
-      $.item_top,
+      $.item_item,
       $.item_scope,
-      // $.___item_repeat
+      $.items_repeat
     ),
 
-    item_top: $ => seq(
+    item_item: $ => seq(
       $.marker,
       $.content,
       optional(
-        $.item_scope
+        seq(
+          $.newline,
+          choice(
+            $.item_scope,
+            $.body
+          )
+        )
       )
     ),
 
     item_scope: $ => seq(
-      $.newline,
       $.indent,
       $.item,
-      optional($.___item_repeat),
+      optional($.items_repeat),
       choice(
         $.dedent,
         $.eof
       )
     ),
 
-    ___item_repeat: $ => repeat1(
+    items_repeat: $ => repeat1(
       seq(
-        $.newline, // or beginning of file
+        $.start_of_line,
         $.eqdent,
         $.item,
       )
     ),
 
+    ////// Item markers //////
     marker_task_pending: _ => marker('-'),
     marker_property_info: _ => marker('\\*'),
 
@@ -85,9 +102,5 @@ module.exports = grammar({
       $.marker_task_pending,
       $.marker_property_info
     ),
-
-    body: _ => repeat1(
-      /[^*]+/,
-    )
   }
 });

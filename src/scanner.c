@@ -5,6 +5,7 @@ enum TokenType {
     INDENT,
     DEDENT,
     EQDENT,
+    BEGIN_OF_FILE,
     END_OF_FILE,
     ERROR_RECOVERY
 };
@@ -16,7 +17,6 @@ typedef struct {
     int emitted_section_depth;
     bool did_emit_start;
 } Scanner;
-
 
 void *tree_sitter_note_external_scanner_create(void) {
     return calloc(1, sizeof(Scanner));
@@ -33,7 +33,6 @@ unsigned tree_sitter_note_external_scanner_serialize(
     memcpy(buffer, payload, sizeof(Scanner));
     return sizeof(Scanner);
 }
-
 
 void tree_sitter_note_external_scanner_deserialize(
   void *payload,
@@ -59,7 +58,7 @@ void tree_sitter_note_external_scanner_deserialize(
     }
 }
 
-// mark_end true marks the end after consuming the whitespaces
+// mark_end true marks after consuming whitespaces
 // all advances are skip false https://github.com/tree-sitter/tree-sitter/issues/2315
 // advance skip true really means mark begin, so needs to be handled in the calling context of this function
 int find_marker_column(TSLexer *lexer, bool mark_end) {
@@ -135,6 +134,19 @@ bool tree_sitter_note_external_scanner_scan(
 
     print_debugs(valid_symbols);
 
+    // https://github.com/tree-sitter/tree-sitter/issues/3433
+    // store get_column so we only call once
+    uint32_t col = lexer->get_column(lexer);
+
+    if (valid_symbols[BEGIN_OF_FILE]) {
+        if (!scanner->did_emit_start && col == 0) {
+            lexer->result_symbol = BEGIN_OF_FILE;
+            scanner->did_emit_start = true;
+
+            return true;
+        }
+    }
+
     if (valid_symbols[DEDENT]) {
         printf("--- searching dedent\n");
 
@@ -177,11 +189,10 @@ bool tree_sitter_note_external_scanner_scan(
         }
     }
 
-
     if (valid_symbols[INDENT] || valid_symbols[EQDENT]) {
         printf("--- searching [in/eq]dents\n");
 
-        if (lexer->get_column(lexer) != 0) {
+        if (col != 0) {
             printf("--- not col 0\n");
             return false;
         }
