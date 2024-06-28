@@ -14,23 +14,20 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
-    [$.body_lines], // TODO clean these up so that all newline-based conflicts are in one scope, I think most (all?) of these are due to newline handling and 1 token lookahead
-    [$.items_repeat],
+    // TODO clean these up so that all newline-based conflicts are in one scope, I think most (all?) of these are due to newline handling and 1 token lookahead
+    [$.item_item, $.body],
     [$.item_item],
-    // [$.body],
+    [$.items],
+    [$.body],
   ],
 
   extras: _ => [], // explicit everything
 
   rules: {
     document: $ => seq(
-      optional(
-        seq(
-          $.start_of_line,
-          $.body
-        )
-      ),
-      optional($.items_repeat),
+      optional($.body),
+      optional($.items),
+      optional($.newline),
       $.eof
     ),
 
@@ -49,71 +46,46 @@ module.exports = grammar({
     ////// Items //////
     content: _ => /.+/,
 
-    item: $ => choice(
-      $.item_item,
-      $.item_scope,
-      $.items_repeat
-    ),
-
-    item_item: $ => seq(
+    item_item: $ => prec(1, seq(
       $.marker,
       $.content,
       optional(
-        seq(
-          $.newline,
-          choice(
-            $.item_scope,
-            $.body
-          )
+        choice(
+          $.item_scope,
+          $.body
         )
       )
-    ),
+    )),
 
     item_scope: $ => seq(
-      $.indent,
-      $.item,
-      optional($.items_repeat),
+      seq($.start_of_line, alias($.item_indent, $.item)),
+      optional($.items),
       choice(
         $.dedent,
         $.eof
       )
     ),
 
-    // TODO this is almost always wrapped in an optional, should I change to repeat instead of repeat1?
-    // That may make this be able to match nothing?
-    items_repeat: $ => repeat1(
-      seq(
-        $.start_of_line,
-        $.eqdent,
-        $.item,
-      )
-    ),
+    item_indent: $ => seq($.indent, $.item_item),
+    item_eqdent: $ => seq($.eqdent, $.item_item),
+
+    items: $ => prec(2, choice(
+      seq($.start_of_line, alias($.item_eqdent, $.item)),
+      seq($.items, $.items)
+    )),
 
 
     ////// Item body //////
-    body: $ => repeat1(
-      choice(
-        $.body_lines,
-        $.code_block
-      )
+    body: $ => choice(
+      seq($.start_of_line, $.body_line),
+      seq($.start_of_line, $.code_block),
+      prec.left(seq($.body, $.newline, $.body))
     ),
 
     body_line: _ => /.+/,
-    body_lines: $ => seq(
-      $.body_line,
-      prec.left(
-        repeat(
-          seq(
-            $.newline,
-            $.body_line
-          )
-        )
-      ),
-      $.newline
-    ),
 
     code_block_language: $ => $.body_line,
-    code_block_content: $ => prec.left($.body_lines),
+    code_block_content: $ => prec.left(repeat1($.body_line)),
     code_block_fence_start: $ => choice(
       token(prec(2, /```\n/)),
       seq(
