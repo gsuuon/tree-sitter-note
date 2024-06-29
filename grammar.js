@@ -1,3 +1,4 @@
+/// char should be regex escaped if necessary
 function marker(char) {
   return RegExp(`\\s*${char} `)
 }
@@ -82,7 +83,7 @@ module.exports = grammar({
     ////// Item body //////
     body: $ => prec.dynamic(1, choice(
       $.body_line,
-      // seq($.start_of_line, $.code_block),
+      $.code_block,
       seq($.body, $.start_of_line, $.body)
     )),
 
@@ -98,10 +99,15 @@ module.exports = grammar({
         $.newline
       ),
     ),
+    code_block_fence_end: $ => seq(
+      $.newline,
+      token(prec(2, /```/))
+    ),
+
     code_block: $ => seq(
       $.code_block_fence_start,
       $.code_block_content,
-      token(prec(2, /```\n/)),
+      $.code_block_fence_end,
     ),
 
 
