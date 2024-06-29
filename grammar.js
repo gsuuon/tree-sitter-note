@@ -25,6 +25,7 @@ module.exports = grammar({
 
   rules: {
     document: $ => seq(
+      $.start_of_line,
       optional($.body),
       optional($.items),
       optional($.newline),
@@ -46,16 +47,19 @@ module.exports = grammar({
     ////// Items //////
     content: _ => /.+/,
 
-    item_item: $ => prec(1, seq(
+    item_item: $ => seq(
       $.marker,
       $.content,
       optional(
-        choice(
-          $.item_scope,
-          $.body
+        seq(
+          $.start_of_line,
+          choice(
+            $.item_scope,
+            $.body
+          )
         )
       )
-    )),
+    ),
 
     item_scope: $ => seq(
       seq($.start_of_line, alias($.item_indent, $.item)),
@@ -69,18 +73,18 @@ module.exports = grammar({
     item_indent: $ => seq($.indent, $.item_item),
     item_eqdent: $ => seq($.eqdent, $.item_item),
 
-    items: $ => prec(2, choice(
-      seq($.start_of_line, alias($.item_eqdent, $.item)),
-      seq($.items, $.items)
+    items: $ => prec.dynamic(2, choice(
+      alias($.item_eqdent, $.item),
+      seq($.items, $.start_of_line, $.items)
     )),
 
 
     ////// Item body //////
-    body: $ => choice(
-      seq($.start_of_line, $.body_line),
-      seq($.start_of_line, $.code_block),
-      prec.left(seq($.body, $.newline, $.body))
-    ),
+    body: $ => prec.dynamic(1, choice(
+      $.body_line,
+      // seq($.start_of_line, $.code_block),
+      seq($.body, $.start_of_line, $.body)
+    )),
 
     body_line: _ => /.+/,
 
