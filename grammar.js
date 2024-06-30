@@ -3,6 +3,10 @@ function marker(char) {
   return RegExp(`\\s*${char} `)
 }
 
+function lex(precedence, pattern) {
+  return token(prec(precedence, pattern))
+}
+
 module.exports = grammar({
   name: 'note',
 
@@ -10,13 +14,22 @@ module.exports = grammar({
     $.indent,
     $.dedent,
     $.eqdent,
+    $.section_in,
+    $.section_de,
+    $.section_eq,
     $.bof,
     $.eof,
   ],
 
+  // inline: $ => [$.section_section],
+  // i want to inline to deduplicate a possibly empty string sequence
+
   conflicts: $ => [
-    // TODO clean these up so that all newline-based conflicts are in one scope, I think most (all?) of these are due to newline handling and 1 token lookahead
-    [$.item_item, $.body],
+    // TODO clean these up. I think most (all?) of these are due to newline handling and 1 token lookahead
+    [$.body, $.item_item],
+    [$.body, $.section_section],
+    [$.items, $.section_section],
+    [$.sections],
     [$.item_item],
     [$.items],
     [$.body],
@@ -26,10 +39,7 @@ module.exports = grammar({
 
   rules: {
     document: $ => seq(
-      $.start_of_line,
-      optional($.body),
-      optional($.items),
-      optional($.newline),
+      $.section_bof,
       $.eof
     ),
 
@@ -63,7 +73,8 @@ module.exports = grammar({
     ),
 
     item_scope: $ => seq(
-      seq($.start_of_line, alias($.item_indent, $.item)),
+      alias($.item_indent, $.item),
+      $.start_of_line,
       optional($.items),
       choice(
         $.dedent,
@@ -87,6 +98,7 @@ module.exports = grammar({
       seq($.body, $.start_of_line, $.body)
     )),
 
+    // I want this to be the lowest precedence lex
     body_line: _ => /.+/,
 
     code_block_language: $ => $.body_line,
@@ -117,6 +129,52 @@ module.exports = grammar({
     marker: $ => choice(
       $.marker_task_pending,
       $.marker_property_info
+    ),
+
+    ////// Sections //////
+    section_header: _ => lex(2, /#+\s.+/),
+
+    section_section: $ => choice(
+      // TODO how do I say one or more of these terms in a given order?
+      // can be body and or items and or section scope, but at least one and in that order
+      seq(
+        $.items,
+        optional($.section_scope)
+      ),
+      seq(
+        $.body,
+        optional($.items),
+        optional($.section_scope)
+      ),
+      $.items,
+      $.body,
+      $.section_scope,
+    ),
+
+    section: $ => prec.dynamic(2, seq(
+      $.section_header,
+      $.start_of_line,
+      $.section_section
+    )),
+
+    section_bof: $ => seq(
+      $.bof,
+      $.section_section
+    ),
+
+    section_scope: $ => prec.dynamic(2, seq(
+      $.section_in,
+      $.section,
+      optional($.sections),
+      choice(
+        $.section_de,
+        $.eof
+      )
+    )),
+
+    sections: $ => choice(
+      seq($.section_eq, $.section),
+      seq($.sections, $.start_of_line, $.sections)
     ),
   }
 });

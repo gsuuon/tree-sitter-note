@@ -5,6 +5,9 @@ enum TokenType {
     INDENT,
     DEDENT,
     EQDENT,
+    SECTION_IN,
+    SECTION_DE,
+    SECTION_EQ,
     BEGIN_OF_FILE,
     END_OF_FILE,
     ERROR_RECOVERY
@@ -102,27 +105,69 @@ int find_marker_column(TSLexer *lexer, bool mark_end) {
 }
 
 void print_debugs(const bool *valid_symbols) {
-    printf("--- lex\n");
+    printf("--- lex valid_symbols\n");
     if (valid_symbols[INDENT]) { printf("--- valid: INDENT\n"); }
     if (valid_symbols[DEDENT]) { printf("--- valid: DEDENT\n"); }
     if (valid_symbols[EQDENT]) { printf("--- valid: EQDENT\n"); }
+
+    if (valid_symbols[SECTION_IN]) { printf("--- valid: SECTION_IN\n"); }
+    if (valid_symbols[SECTION_DE]) { printf("--- valid: SECTION_DE\n"); }
+    if (valid_symbols[SECTION_EQ]) { printf("--- valid: SECTION_EQ\n"); }
+
+    if (valid_symbols[BEGIN_OF_FILE]) { printf("--- valid: BEGIN_OF_FILE\n"); }
     if (valid_symbols[END_OF_FILE]) { printf("--- valid: END_OF_FILE\n"); }
 
     if (valid_symbols[ERROR_RECOVERY]) { printf("--- valid: ERROR_RECOVERY\n"); }
+}
 
-    if (valid_symbols[ERROR_RECOVERY]) {
-        printf("--- error\n");
-        // docs seem to be wrong? error_recovery can be valid without all other tokens being valid
-        // or some sort of cache issue is causing the token enum to get out of sync between grammar.json and this?
-        /* return false; */
+/// Sets scanner state on success
+enum TokenType try_find_section_symbol(
+    Scanner *scanner,
+    TSLexer *lexer,
+    const bool *valid_symbols,
+    int *depth
+) {
+    printf("--- Section find\n");
+    if (valid_symbols[SECTION_EQ] && scanner->last_section_depth == 0) {
+        printf("--- Section eq depth 0\n");
+        return SECTION_EQ;
     }
 
-    if (valid_symbols[INDENT]
-        && valid_symbols[EQDENT]
-        && valid_symbols[DEDENT]
-    ) {
-        printf("--- OOPS: [in/eq/de]dent all valid\n");
+    while (lexer->lookahead == '#') {
+        lexer->advance(lexer, false);
+        (*depth)++;
     }
+
+    printf("--- Section depth: %i\n", (*depth));
+
+    if (lexer->lookahead != ' ') {
+
+        printf("--- Section: not a header, missing space after #\n");
+        return -1;
+    }
+
+    // Gone 1 deeper (can only increase section depth 1 at a time)
+    if (valid_symbols[SECTION_IN] && (*depth) == scanner->last_section_depth + 1) {
+        return SECTION_IN;
+    }
+
+    if (valid_symbols[SECTION_DE]) {
+        // We've closed several sections and need to emit more 0 width section_de, e.g. #### to #
+        if (scanner->emitted_section_depth > scanner->last_section_depth) {
+            return SECTION_DE;
+        }
+
+        // Depth decreased
+        if ((*depth) < scanner->last_section_depth) {
+            return SECTION_DE;
+        }
+    }
+
+    if (valid_symbols[SECTION_EQ] && scanner->last_section_depth == (*depth)) {
+        return SECTION_EQ;
+    }
+
+    return -1;
 }
 
 bool tree_sitter_note_external_scanner_scan(
@@ -189,16 +234,12 @@ bool tree_sitter_note_external_scanner_scan(
         }
     }
 
-    if (valid_symbols[INDENT] || valid_symbols[EQDENT]) {
+    if ((valid_symbols[INDENT] || valid_symbols[EQDENT]) && (col == 0)) {
         printf("--- searching [in/eq]dents\n");
-
-        if (col != 0) {
-            printf("--- not col 0\n");
-            return false;
-        }
 
         int spaces = find_marker_column(lexer, true);
         printf("--- spaces: %i\n", spaces);
+        printf("--- last col: %i\n", scanner->last_indent_column);
 
         if (spaces != -1) {
             if (valid_symbols[INDENT]) {
@@ -224,22 +265,47 @@ bool tree_sitter_note_external_scanner_scan(
                     return true;
                 }
             }
+        }
+    }
 
-            return false;
+    if ((valid_symbols[SECTION_IN] || valid_symbols[SECTION_IN] || valid_symbols[SECTION_EQ]) && (col == 0)) {
+        lexer->mark_end(lexer);
+
+        int depth = 0;
+        enum TokenType symbol = try_find_section_symbol(scanner, lexer, valid_symbols, &depth);
+        printf("--- Section symbol: %i\n", symbol);
+
+        switch (symbol) {
+            case SECTION_IN:
+            case SECTION_DE:
+            case SECTION_EQ: {
+                if (symbol == SECTION_IN) {
+                    scanner->emitted_section_depth = scanner->last_section_depth + 1;
+                } else if (symbol == SECTION_DE) {
+                    scanner->emitted_section_depth = scanner->last_section_depth - 1;
+                }
+
+                lexer->result_symbol = symbol;
+                scanner->last_section_depth = depth;
+
+                // Reset columns
+                scanner->last_indent_column = 0;
+                scanner->emitted_indent_column = 0;
+
+                return true;
+            }
         }
     }
 
     if (valid_symbols[END_OF_FILE]) {
         while(lexer->lookahead == '\n') {
-            lexer->advance(lexer, true);
+            lexer->advance(lexer, false);
         }
 
         if (lexer->eof(lexer)) {
             lexer->result_symbol = END_OF_FILE;
             return true;
         }
-
-        return false;
     }
 
     return false;
