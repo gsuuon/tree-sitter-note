@@ -303,6 +303,7 @@ bool tree_sitter_note_external_scanner_scan(
         }
 
         if (lexer->eof(lexer)) {
+            lexer->mark_end(lexer);
             lexer->result_symbol = END_OF_FILE;
             return true;
         }

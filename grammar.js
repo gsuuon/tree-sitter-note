@@ -11,6 +11,9 @@ module.exports = grammar({
   name: 'note',
 
   externals: $ => [
+    // NOTE dedent starts before the ending newline of an item, while eqdent/indent start after the newline
+    // this is because dedent is 0-width, skipping the newline and can be immediately followed by another eqdent so that
+    // all same-level items begin with an eqdent (including after a dedent)
     $.indent,
     $.dedent,
     $.eqdent,
@@ -39,8 +42,7 @@ module.exports = grammar({
 
   rules: {
     document: $ => seq(
-      $.section_bof,
-      $.eof
+      $.section_bof
     ),
 
 
@@ -49,7 +51,7 @@ module.exports = grammar({
     // This only exists because there is no BOF or regex anchoring
     start_of_line: $ => choice(
       $.newline,
-      $.bof,
+      // $.bof,
     ),
 
     newline: _ => /\n/,
@@ -64,26 +66,36 @@ module.exports = grammar({
       optional(
         seq(
           $.start_of_line,
-          choice(
-            $.item_scope,
-            $.body
-          )
+          $.body
         )
-      )
+      ),
+      optional(
+        seq(
+          $.start_of_line,
+          $.item_scope,
+        )
+      ),
     ),
 
-    item_scope: $ => seq(
-      alias($.item_indent, $.item),
-      $.start_of_line,
-      optional($.items),
+    item_scope: $ => prec.right(seq(
+      prec.dynamic(2, alias($.item_indent, $.item)),
+      optional(
+        seq(
+          $.start_of_line,
+          $.items
+        )
+      ),
       choice(
         $.dedent,
-        $.eof
+        seq(
+          optional($.start_of_line),
+          $.eof
+        ),
       )
-    ),
+    )),
 
-    item_indent: $ => seq($.indent, $.item_item),
-    item_eqdent: $ => seq($.eqdent, $.item_item),
+    item_indent: $ => prec.dynamic(2, seq($.indent, $.item_item)),
+    item_eqdent: $ => prec.dynamic(2, seq($.eqdent, $.item_item)),
 
     items: $ => prec.dynamic(2, choice(
       alias($.item_eqdent, $.item),
