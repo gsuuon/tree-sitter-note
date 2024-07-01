@@ -1,10 +1,10 @@
-/// char should be regex escaped if necessary
-function marker(char) {
-  return RegExp(`\\s*${char} `)
-}
-
 function lex(precedence, pattern) {
   return token(prec(precedence, pattern))
+}
+
+/// char should be regex escaped if necessary
+function marker(char) {
+  return lex(2, RegExp(`\\s*${char} `))
 }
 
 module.exports = grammar({
@@ -30,9 +30,10 @@ module.exports = grammar({
   conflicts: $ => [
     // TODO clean these up. I think most (all?) of these are due to newline handling and 1 token lookahead
     [$.body, $.item_item],
-    [$.body, $.section_section],
-    [$.items, $.section_section],
+    [$.items, $.item_scope],
+    [$.section_section],
     [$.sections],
+    [$.item_scope],
     [$.item_item],
     [$.items],
     [$.body],
@@ -42,18 +43,17 @@ module.exports = grammar({
 
   rules: {
     document: $ => seq(
-      $.section_bof
+      $.section_bof,
+      $.eof
     ),
-
 
     ////// Newlines //////
-
-    // This only exists because there is no BOF or regex anchoring
     start_of_line: $ => choice(
-      $.newline,
-      // $.bof,
+      $.newlines,
+      $.eqdent // NOTE: eqdent can always be emitted at start of line since we can't mark_end after advancing - see notes in scanner
     ),
 
+    newlines: _ => /\n+/,
     newline: _ => /\n/,
 
 
@@ -71,47 +71,41 @@ module.exports = grammar({
       ),
       optional(
         seq(
-          $.start_of_line,
           $.item_scope,
         )
       ),
     ),
 
-    item_scope: $ => prec.right(seq(
-      prec.dynamic(2, alias($.item_indent, $.item)),
+    item_indent: $ => seq($.indent, $.item_item),
+    item_eqdent: $ => seq($.eqdent, $.item_item),
+
+    item_scope: $ => prec.dynamic(2, seq(
+      alias($.item_indent, $.item),
       optional(
         seq(
-          $.start_of_line,
+          $.newlines,
           $.items
         )
       ),
-      choice(
-        $.dedent,
-        seq(
-          optional($.start_of_line),
-          $.eof
-        ),
-      )
+      optional($.dedent),
     )),
 
-    item_indent: $ => prec.dynamic(2, seq($.indent, $.item_item)),
-    item_eqdent: $ => prec.dynamic(2, seq($.eqdent, $.item_item)),
-
-    items: $ => prec.dynamic(2, choice(
-      alias($.item_eqdent, $.item),
-      seq($.items, $.start_of_line, $.items)
-    )),
+    items: $ => choice(
+      prec.dynamic(2, alias($.item_eqdent, $.item)),
+      seq($.items, $.items)
+    ),
 
 
     ////// Item body //////
-    body: $ => prec.dynamic(1, choice(
-      $.body_line,
-      $.code_block,
-      seq($.body, $.start_of_line, $.body)
-    )),
 
     // I want this to be the lowest precedence lex
     body_line: _ => /.+/,
+
+    body: $ => choice(
+      $.body_line,
+      $.code_block,
+      seq($.body, $.start_of_line, $.body)
+    ),
 
     code_block_language: $ => $.body_line,
     code_block_content: $ => prec.left(repeat1($.body_line)),
@@ -134,7 +128,6 @@ module.exports = grammar({
       $.code_block_fence_end,
     ),
 
-
     ////// Item markers //////
     marker_task_pending: _ => marker('-'),
     marker_property_info: _ => marker('\\*'),
@@ -149,23 +142,17 @@ module.exports = grammar({
     section_section: $ => choice(
       // TODO how do I say one or more of these terms in a given order?
       // can be body and or items and or section scope, but at least one and in that order
+      $.items,
       seq(
         $.items,
-        optional($.section_scope)
+        $.newlines,
+        $.section_scope
       ),
-      seq(
-        $.body,
-        optional($.items),
-        optional($.section_scope)
-      ),
-      $.items,
-      $.body,
-      $.section_scope,
     ),
 
     section: $ => prec.dynamic(2, seq(
       $.section_header,
-      $.start_of_line,
+      $.newlines,
       $.section_section
     )),
 
@@ -177,7 +164,7 @@ module.exports = grammar({
     section_scope: $ => prec.dynamic(2, seq(
       $.section_in,
       $.section,
-      optional($.sections),
+      optional(seq($.newlines, $.sections)),
       choice(
         $.section_de,
         $.eof
@@ -186,7 +173,7 @@ module.exports = grammar({
 
     sections: $ => choice(
       seq($.section_eq, $.section),
-      seq($.sections, $.start_of_line, $.sections)
+      seq($.sections, $.newlines, $.sections)
     ),
   }
 });

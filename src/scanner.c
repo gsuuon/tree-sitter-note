@@ -61,21 +61,13 @@ void tree_sitter_note_external_scanner_deserialize(
     }
 }
 
-// mark_end true marks after consuming whitespaces
-// all advances are skip false https://github.com/tree-sitter/tree-sitter/issues/2315
-// advance skip true really means mark begin, so needs to be handled in the calling context of this function
-int find_marker_column(TSLexer *lexer, bool mark_end) {
+int find_marker_column(TSLexer *lexer) {
     int spaces = 0;
-    printf("--- Finding marker, mark_end: %s\n", mark_end ? "true" : "false");
+    printf("--- Finding marker\n");
 
     while (lexer->lookahead == ' ') {
         spaces++;
         lexer->advance(lexer, false);
-    }
-
-    if (mark_end) {
-        printf("--- Mark end after spaces: %i\n", spaces);
-        lexer->mark_end(lexer);
     }
 
     switch (lexer->lookahead) {
@@ -85,23 +77,11 @@ int find_marker_column(TSLexer *lexer, bool mark_end) {
         case '=':
         case '*':
         case '[': {
-            // next char needs to be space
-            lexer->advance(lexer, false);
-            if (lexer->lookahead != ' ') {
-                return -1;
-            }
-
-            // next char can't be newline
-            lexer->advance(lexer, false);
-            if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
-                return -1;
-            }
-
             return spaces;
         }
-        default:
-            return -1;
     }
+
+    return -1;
 }
 
 void print_debugs(const bool *valid_symbols) {
@@ -192,77 +172,74 @@ bool tree_sitter_note_external_scanner_scan(
         }
     }
 
-    if (valid_symbols[DEDENT]) {
-        printf("--- searching dedent\n");
-
-        // Still have dedents that need to be emitted
-        if (scanner->emitted_indent_column > scanner->last_indent_column) {
-
-            printf("--- had queued dedent\n");
-            lexer->result_symbol = DEDENT;
-
-            scanner->emitted_indent_column = scanner->emitted_indent_column - 2;
-
-            return true;
-        }
+    if (valid_symbols[INDENT] || valid_symbols[EQDENT] || valid_symbols[DEDENT]) {
+        printf("--- searching [in/eq/de]dents\n");
 
         bool did_see_newline = false;
 
-        // mark_end then advance skip makes this 0-width, doesn't consume the newline
-        lexer->mark_end(lexer);
-
         while (lexer->lookahead == '\n') {
-            printf("--- dedent consume newline\n");
             lexer->advance(lexer, true);
             did_see_newline = true;
         }
 
-        if (did_see_newline) {
-            int spaces = find_marker_column(lexer, false);
+        lexer->mark_end(lexer);
 
-            // See a dedent
-            if (spaces < scanner->last_indent_column && spaces % 2 == 0) {
-
+        if (lexer->get_column(lexer) == 0) {
+            // Still have dedents that need to be emitted - don't care about the spaces
+            if (valid_symbols[DEDENT] && scanner->emitted_indent_column > scanner->last_indent_column) {
+                printf("--- had queued dedent\n");
                 lexer->result_symbol = DEDENT;
 
-                scanner->emitted_indent_column = scanner->last_indent_column - 2;
-                scanner->last_indent_column = spaces;
+                scanner->emitted_indent_column = scanner->emitted_indent_column - 2;
 
                 return true;
             }
 
-        }
-    }
+            int spaces = find_marker_column(lexer);
+            printf("--- spaces: %i\n", spaces);
+            printf("--- last col: %i\n", scanner->last_indent_column);
 
-    if ((valid_symbols[INDENT] || valid_symbols[EQDENT]) && (col == 0)) {
-        printf("--- searching [in/eq]dents\n");
+            if (spaces != -1) {
+                if (valid_symbols[INDENT]) {
+                    if (spaces == scanner->last_indent_column + 2) {
 
-        int spaces = find_marker_column(lexer, true);
-        printf("--- spaces: %i\n", spaces);
-        printf("--- last col: %i\n", scanner->last_indent_column);
+                        lexer->mark_end(lexer);
+                        lexer->result_symbol = INDENT;
 
-        if (spaces != -1) {
-            if (valid_symbols[INDENT]) {
-                if (spaces == scanner->last_indent_column + 2) {
+                        scanner->last_indent_column = spaces;
+                        scanner->emitted_indent_column = spaces;
 
-                    lexer->result_symbol = INDENT;
-
-                    scanner->last_indent_column = spaces;
-                    scanner->emitted_indent_column = spaces;
-
-                    return true;
+                        return true;
+                    }
                 }
-            }
 
-            if (valid_symbols[EQDENT]) {
-                if (spaces == scanner->last_indent_column) {
+                if (valid_symbols[EQDENT]) {
+                    if (spaces == scanner->last_indent_column && !lexer->eof(lexer)) {
 
-                    lexer->result_symbol = EQDENT;
+                        lexer->mark_end(lexer);
+                        lexer->result_symbol = EQDENT;
 
-                    scanner->last_indent_column = spaces;
-                    scanner->emitted_indent_column = spaces;
+                        scanner->last_indent_column = spaces;
+                        scanner->emitted_indent_column = spaces;
 
-                    return true;
+                        return true;
+                    }
+                }
+
+                if (valid_symbols[DEDENT]) {
+                    if (did_see_newline) {
+                        // See a dedent
+                        if (spaces < scanner->last_indent_column && spaces % 2 == 0) {
+
+                            // don't mark_end, we don't want the spaces after dedent so that an eqdent can immediately follow
+                            lexer->result_symbol = DEDENT;
+
+                            scanner->emitted_indent_column = scanner->last_indent_column - 2;
+                            scanner->last_indent_column = spaces;
+
+                            return true;
+                        }
+                    }
                 }
             }
         }
