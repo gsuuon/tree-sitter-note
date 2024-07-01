@@ -39,13 +39,15 @@ module.exports = grammar({
     [$.body],
   ],
 
-  extras: _ => [], // explicit everything
+  // explicit whitespace/newlines
+  extras: $ => [],
 
   rules: {
     document: $ => seq(
       $.section_bof,
       $.eof
     ),
+
 
     ////// Newlines //////
     start_of_line: $ => choice(
@@ -58,11 +60,9 @@ module.exports = grammar({
 
 
     ////// Items //////
-    content: _ => /.+/,
-
     item_item: $ => seq(
       $.marker,
-      $.content,
+      alias($.body_line, $.content),
       optional(
         seq(
           $.start_of_line,
@@ -97,9 +97,19 @@ module.exports = grammar({
 
 
     ////// Item body //////
+    body_segment: $ => prec.left(choice(
+      /\S+/,
+      alias(/\s\[\S+\]\s/, $.link),
+      alias(' -> ', $.decorate_flow),
+      seq($.body_segment, $.body_segment)
+    )),
 
-    // I want this to be the lowest precedence lex
-    body_line: _ => /.+/,
+    decorate_select: _ => ' <-',
+
+    body_line: $ => choice(
+      $.body_segment,
+      seq($.body_segment, $.decorate_select)
+    ),
 
     body: $ => choice(
       $.body_line,
@@ -107,8 +117,9 @@ module.exports = grammar({
       seq($.body, $.start_of_line, $.body)
     ),
 
-    code_block_language: $ => $.body_line,
-    code_block_content: $ => prec.left(repeat1($.body_line)),
+    // TODO this part maybe needs some work
+    code_block_language: _ => /.+/,
+    code_block_content: $ => prec.left(repeat1(/.+/)),
     code_block_fence_start: $ => choice(
       token(prec(2, /```\n/)),
       seq(
