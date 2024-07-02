@@ -26,8 +26,7 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
-    [$._body, $._item_item],
-    [$._body, $._section_section],
+    [$._body, $._body_tail],
 
     [$.section],
     [$._section_section],
@@ -37,6 +36,7 @@ module.exports = grammar({
     [$._items],
 
     [$._body_segment],
+    [$._body_tail],
     [$._body],
   ],
 
@@ -45,11 +45,13 @@ module.exports = grammar({
 
   rules: {
     document: $ => seq(
-      $._section_bof,
+      $._bof,
+      optional($._newlines),
+      $._section_section,
       $._eof
     ),
 
-    _newlines: $ => prec.right(choice(
+    _newlines: $ => prec.right(2, choice(
       $._newline,
       seq($._newlines, $._newlines)
     )),
@@ -95,7 +97,7 @@ module.exports = grammar({
 
 
     ////// body //////
-    _body_segment: $ => prec.dynamic(0, choice(
+    _body_segment: $ => choice(
       /[ ]+/,
       alias(/\[\(.+\).*\]/, $.link),
       alias(/\[.+\|.+\]/, $.link),
@@ -104,7 +106,7 @@ module.exports = grammar({
       $._decorate,
 
       /[^ \n]+/
-    )),
+    ),
 
     decorate_select: _ => ' <-',
     decorate_warn: _ => ' (!)',
@@ -117,17 +119,26 @@ module.exports = grammar({
     ),
 
     // TODO may not need this wrapper
-    _body_line: $ => $._body_segment,
+    _body_line: $ => prec.dynamic(1, $._body_segment),
 
     // TODO clean this and the alias($._body, $.body) members
     // This is unnamed and then aliased so we can get the combined term seq without extra nodes
     // i could also wrap this but that creates a conflict with the wrapping term
-    _body: $ => choice(
+    _body_tail: $ => choice(
       $._body_line,
       $.code_block,
-      seq($._body, $._newlines, $._body)
+      seq($._body_tail, $._newlines, $._body_tail)
     ),
 
+    _body_head: _ => /[^#-,\.=].*/,
+
+    _body: $ => seq(
+      choice(
+        $._body_head,
+        $.code_block
+      ),
+      optional(seq($._newlines, $._body_tail))
+    ),
 
     ////// code block //////
     _code_block_lines: $ => prec.left(choice(
@@ -181,12 +192,11 @@ module.exports = grammar({
 
 
     ////// section //////
-    section_header: _ => lex(2, /#+\s.+/),
+    section_header: _ => lex(2, /#+ .+/),
 
     _section_section: $ => choice(
       // TODO is there a better way to say one or more of these terms in a given order?
       // can be body and or items and or section scope, but at least one and in that order
-
 
       // one of any
       alias($._body, $.body),
@@ -221,26 +231,20 @@ module.exports = grammar({
     section: $ => prec.dynamic(2, seq(
       $.section_header,
       optional(
-        seq(
-          $._newlines,
-          choice(
-            $._section_section,
-            $._eof
-          )
+        $._newlines
+      ),
+      optional(
+        choice(
+          $._section_section,
         )
       )
     )),
 
-    _section_bof: $ => seq(
-      $._bof,
-      optional($._newlines),
-      $._section_section
-    ),
-
     _section_scope: $ => prec.dynamic(2, seq(
       $._section_in,
+      optional($._newlines),
       $.section,
-      optional(seq($._newlines, $._sections)),
+      optional($._sections),
       choice(
         $._section_de,
         $._eof
@@ -249,7 +253,7 @@ module.exports = grammar({
 
     _sections: $ => choice(
       seq($._section_eq, $.section),
-      seq($._sections, $._newlines, $._sections)
+      seq($._sections, optional($._newlines), $._sections)
     ),
   }
 });

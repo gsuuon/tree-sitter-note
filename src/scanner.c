@@ -228,8 +228,21 @@ bool tree_sitter_note_external_scanner_scan(
     }
 
 
-    if ((valid_symbols[SECTION_IN] || valid_symbols[SECTION_DE] || valid_symbols[SECTION_EQ]) && (col == 0)) {
+    if (valid_symbols[SECTION_IN] || valid_symbols[SECTION_DE] || valid_symbols[SECTION_EQ]) {
         lexer->mark_end(lexer);
+
+        if (col != 0) {
+            while(lexer->lookahead == '\n') {
+                lexer->advance(lexer, false);
+            }
+
+            if (lexer->get_column(lexer) != 0) {
+                return false;
+            }
+
+            lexer->mark_end(lexer);
+        }
+
 
         int depth = 0;
         enum TokenType symbol = try_find_section_symbol(scanner, lexer, valid_symbols, &depth);
