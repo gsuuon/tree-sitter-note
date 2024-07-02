@@ -10,6 +10,26 @@
         {
           "type": "code_block",
           "named": true
+        },
+        {
+          "type": "decorator_flow",
+          "named": true
+        },
+        {
+          "type": "decorator_question",
+          "named": true
+        },
+        {
+          "type": "decorator_select",
+          "named": true
+        },
+        {
+          "type": "decorator_warn",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
         }
       ]
     }
@@ -44,12 +64,43 @@
     "fields": {}
   },
   {
-    "type": "document",
+    "type": "content",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
       "required": false,
+      "types": [
+        {
+          "type": "decorator_flow",
+          "named": true
+        },
+        {
+          "type": "decorator_question",
+          "named": true
+        },
+        {
+          "type": "decorator_select",
+          "named": true
+        },
+        {
+          "type": "decorator_warn",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "document",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
       "types": [
         {
           "type": "body",
@@ -69,42 +120,7 @@
   {
     "type": "item",
     "named": true,
-    "fields": {
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "marker_property_info",
-            "named": true
-          },
-          {
-            "type": "marker_property_label",
-            "named": true
-          },
-          {
-            "type": "marker_task_cancelled",
-            "named": true
-          },
-          {
-            "type": "marker_task_current",
-            "named": true
-          },
-          {
-            "type": "marker_task_done",
-            "named": true
-          },
-          {
-            "type": "marker_task_paused",
-            "named": true
-          },
-          {
-            "type": "marker_task_pending",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": true,
@@ -120,9 +136,42 @@
         {
           "type": "item",
           "named": true
+        },
+        {
+          "type": "marker_property_info",
+          "named": true
+        },
+        {
+          "type": "marker_property_label",
+          "named": true
+        },
+        {
+          "type": "marker_task_cancelled",
+          "named": true
+        },
+        {
+          "type": "marker_task_current",
+          "named": true
+        },
+        {
+          "type": "marker_task_done",
+          "named": true
+        },
+        {
+          "type": "marker_task_paused",
+          "named": true
+        },
+        {
+          "type": "marker_task_pending",
+          "named": true
         }
       ]
     }
+  },
+  {
+    "type": "link",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "section",
@@ -141,7 +190,7 @@
           "named": true
         },
         {
-          "type": "section_children",
+          "type": "section",
           "named": true
         },
         {
@@ -152,39 +201,19 @@
     }
   },
   {
-    "type": "section_children",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "section",
-          "named": true
-        }
-      ]
-    }
+    "type": "decorator_flow",
+    "named": true
   },
   {
-    "type": "section_header",
-    "named": true,
-    "fields": {}
+    "type": "decorator_question",
+    "named": true
   },
   {
-    "type": "\n",
-    "named": false
+    "type": "decorator_select",
+    "named": true
   },
   {
-    "type": "```",
-    "named": false
-  },
-  {
-    "type": "```\n",
-    "named": false
-  },
-  {
-    "type": "content",
+    "type": "decorator_warn",
     "named": true
   },
   {
@@ -213,6 +242,10 @@
   },
   {
     "type": "marker_task_pending",
+    "named": true
+  },
+  {
+    "type": "section_header",
     "named": true
   }
 ]

@@ -220,3 +220,40 @@ item child, section, item child
       (item
         (marker_task_pending)
         (content)))))
+
+
+================================================================================
+section siblings and items
+================================================================================
+
+# s
+# s
+# s
+## s
+- a
+- a
+- b
+## t
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (section_header))
+  (section
+    (section_header))
+  (section
+    (section_header)
+    (section
+      (section_header)
+      (item
+        (marker_task_pending)
+        (content))
+      (item
+        (marker_task_pending)
+        (content))
+      (item
+        (marker_task_pending)
+        (content)))
+    (section
+      (section_header))))
