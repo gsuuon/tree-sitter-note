@@ -26,31 +26,27 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
-    // TODO clean these up. I think most (all?) of these are due to newline handling and 1 token lookahead
     [$._body, $._item_item],
     [$._body, $._section_section],
-    [$._section_section],
+
     [$.section],
+    [$._section_section],
     [$._sections],
+
     [$._item_item],
     [$._items],
+
     [$._body_segment],
     [$._body],
   ],
 
   // explicit whitespace/newlines
-  extras: $ => [],
+  extras: _ => [],
 
   rules: {
     document: $ => seq(
       $._section_bof,
       $._eof
-    ),
-
-    ////// Newlines //////
-    _start_of_line: $ => choice(
-      $._newlines,
-      // $._eqdent // NOTE: eqdent can always be emitted at start of line since we can't mark_end after advancing - see notes in scanner
     ),
 
     _newlines: $ => prec.right(choice(
@@ -61,13 +57,13 @@ module.exports = grammar({
     _newline: _ => /\n/,
 
 
-    ////// Items //////
+    ////// item //////
     _item_item: $ => seq(
       $._marker,
       alias($._body_line, $.content),
       optional(
         seq(
-          $._start_of_line,
+          $._newlines,
           alias($._body, $.body)
         )
       ),
@@ -98,7 +94,7 @@ module.exports = grammar({
     ),
 
 
-    ////// Item body //////
+    ////// body //////
     _body_segment: $ => prec.dynamic(0, choice(
       /[ ]+/,
       alias(/\s\[\S+\]\s/, $.link),
@@ -118,15 +114,17 @@ module.exports = grammar({
       seq($._body_segment, $.decorate_select)
     ),
 
+    // TODO clean this and the alias($._body, $.body) members
+    // This is unnamed and then aliased so we can get the combined term seq without extra nodes
+    // i could also wrap this but that creates a conflict with the wrapping term
     _body: $ => choice(
       $._body_line,
       $.code_block,
-      seq($._body, $._start_of_line, $._body)
+      seq($._body, $._newlines, $._body)
     ),
 
-    // TODO this part maybe needs some work
-    code_block_language: _ => /.+/,
 
+    ////// code block //////
     _code_block_lines: $ => prec.left(choice(
       /.+/,
       seq($._code_block_lines, $._newlines, $._code_block_lines)
@@ -140,6 +138,7 @@ module.exports = grammar({
       ),
     )),
     _code_block_fence_end: _ => lex(2, /```/),
+    code_block_language: _ => /.+/,
     code_block: $ => seq(
       $._code_block_fence_start,
       choice(
@@ -152,6 +151,7 @@ module.exports = grammar({
       ),
       $._code_block_fence_end,
     ),
+
 
     ////// marker //////
     marker_task_pending: _ => marker('\\-'),
@@ -174,35 +174,41 @@ module.exports = grammar({
       $.marker_property_label
     ),
 
-    ////// Sections //////
+
+    ////// section //////
     section_header: _ => lex(2, /#+\s.+/),
 
     _section_section: $ => choice(
-      // TODO how do I say one or more of these terms in a given order?
+      // TODO is there a better way to say one or more of these terms in a given order?
       // can be body and or items and or section scope, but at least one and in that order
+
+
+      // one of any
       alias($._body, $.body),
       $._items,
       $._section_scope,
+
+      // sequences
       seq(
         alias($._body, $.body),
-        $._start_of_line,
+        $._newlines,
         $._items
       ),
       seq(
         alias($._body, $.body),
-        $._start_of_line,
+        $._newlines,
         $._section_scope
       ),
       seq(
         $._items,
-        $._start_of_line,
+        $._newlines,
         $._section_scope
       ),
       seq(
         alias($._body, $.body),
-        $._start_of_line,
+        $._newlines,
         $._items,
-        $._start_of_line,
+        $._newlines,
         $._section_scope
       ),
     ),
