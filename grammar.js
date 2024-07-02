@@ -97,47 +97,61 @@ module.exports = grammar({
 
 
     ////// body //////
-    _body_segment: $ => choice(
-      /[ ]+/,
-      alias(/\[\(.+\).*\]/, $.link),
-      alias(/\[.+\|.+\]/, $.link),
-      alias(' -> ', $.decorate_flow),
-      seq($._body_segment, $._body_segment),
-      $._decorate,
-
-      /[^ \n]+/
+    link: _ => choice(
+      /\{\(.+\).*}/,
+      /\{.+\|.+}/
     ),
 
-    decorate_select: _ => ' <-',
-    decorate_warn: _ => ' (!)',
-    decorate_question: _ => ' (?)',
+    decorator_select: _ => ' <-',
+    decorator_warn: _ => '(!)',
+    decorator_question: _ => '(?)',
+    decorator_flow: _ => ' -> ',
 
-    _decorate: $ => choice(
-      $.decorate_select,
-      $.decorate_warn,
-      $.decorate_question
+    _decorator: $ => choice(
+      $.decorator_select,
+      $.decorator_warn,
+      $.decorator_question,
+      $.decorator_flow
+    ),
+
+    _body_segment: $ => choice(
+      /[ ]+/,
+      /[^ \n]+/,
+      $._decorator,
+      $.link,
+      seq($._body_segment, $._body_segment),
     ),
 
     // TODO may not need this wrapper
     _body_line: $ => prec.dynamic(1, $._body_segment),
 
-    // TODO clean this and the alias($._body, $.body) members
-    // This is unnamed and then aliased so we can get the combined term seq without extra nodes
-    // i could also wrap this but that creates a conflict with the wrapping term
     _body_tail: $ => choice(
       $._body_line,
       $.code_block,
       seq($._body_tail, $._newlines, $._body_tail)
     ),
 
-    _body_head: _ => /[^#-,\.=].*/,
-
-    _body: $ => seq(
+    _body_head: $ => seq(
       choice(
-        $._body_head,
+        /[^#-,\.=\*\[]/, // any char other than marker
+        $.link,
+        $._decorator,
         $.code_block
       ),
-      optional(seq($._newlines, $._body_tail))
+      optional($._body_segment)
+    ),
+
+    // TODO clean this and the alias($._body, $.body) members
+    // This is unnamed and then aliased so we can get the combined term seq without extra nodes
+    // i could also wrap this but that creates a conflict with the wrapping term
+    _body: $ => seq(
+      $._body_head,
+      optional(
+        seq(
+          $._newlines,
+          $._body_tail
+        )
+      )
     ),
 
     ////// code block //////
