@@ -4,7 +4,7 @@ function lex(precedence, pattern) {
 
 /// char should be regex escaped if necessary
 function marker(char) {
-  return lex(2, RegExp(`\\s*${char} `))
+  return lex(2, RegExp(`[ ]*[${char}] `))
 }
 
 module.exports = grammar({
@@ -97,22 +97,27 @@ module.exports = grammar({
     ////// body //////
     _body_segment: $ => prec.dynamic(0, choice(
       /[ ]+/,
-      alias(/\s\[\S+\]\s/, $.link),
+      alias(/\[\(.+\).*\]/, $.link),
+      alias(/\[.+\|.+\]/, $.link),
       alias(' -> ', $.decorate_flow),
       seq($._body_segment, $._body_segment),
+      $._decorate,
 
-      // TODO this may have broken link/decorate but is necessary for bodies that start with spaces
-      // and maybe which contain spaces at all that aren't link or decorate?
-      // i just want this to be lowest prio
       /[^ \n]+/
     )),
 
     decorate_select: _ => ' <-',
+    decorate_warn: _ => ' (!)',
+    decorate_question: _ => ' (?)',
 
-    _body_line: $ => choice(
-      $._body_segment,
-      seq($._body_segment, $.decorate_select)
+    _decorate: $ => choice(
+      $.decorate_select,
+      $.decorate_warn,
+      $.decorate_question
     ),
+
+    // TODO may not need this wrapper
+    _body_line: $ => $._body_segment,
 
     // TODO clean this and the alias($._body, $.body) members
     // This is unnamed and then aliased so we can get the combined term seq without extra nodes

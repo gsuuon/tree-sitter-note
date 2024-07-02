@@ -74,6 +74,7 @@ int find_marker_column(TSLexer *lexer) {
         case '.':
         case ',':
         case '=':
+        case '>':
         case '*':
         case '[': {
             return spaces;
