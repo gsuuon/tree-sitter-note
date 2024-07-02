@@ -47,7 +47,7 @@ section and items
       (content))))
 
 ================================================================================
-Item then section
+item then section
 ================================================================================
 
 - boop
@@ -74,9 +74,8 @@ section, subsection
 (document
   (section
     (section_header)
-    (section_children
-      (section
-        (section_header)))))
+    (section
+      (section_header))))
 
 ================================================================================
 section, subsections
@@ -91,11 +90,10 @@ section, subsections
 (document
   (section
     (section_header)
-    (section_children
-      (section
-        (section_header))
-      (section
-        (section_header)))))
+    (section
+      (section_header))
+    (section
+      (section_header))))
 
 ================================================================================
 section, item, subsection
@@ -113,9 +111,8 @@ section, item, subsection
     (item
       (marker_task_pending)
       (content))
-    (section_children
-      (section
-        (section_header)))))
+    (section
+      (section_header))))
 
 ================================================================================
 section and subsection with item
@@ -134,12 +131,11 @@ section and subsection with item
     (item
       (marker_task_pending)
       (content))
-    (section_children
-      (section
-        (section_header)
-        (item
-          (marker_task_pending)
-          (content))))))
+    (section
+      (section_header)
+      (item
+        (marker_task_pending)
+        (content)))))
 
 ================================================================================
 section with body

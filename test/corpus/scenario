@@ -2,7 +2,7 @@
 Just a body
 ================================================================================
 
-Get things done
+foo
 
 --------------------------------------------------------------------------------
 
@@ -44,12 +44,11 @@ Pretty hot out
   (section
     (section_header)
     (body)
-    (section_children
-      (section
-        (section_header)
+    (section
+      (section_header)
+      (item
+        (marker_property_info)
+        (content)
         (item
           (marker_property_info)
-          (content)
-          (item
-            (marker_property_info)
-            (content)))))))
+          (content))))))
